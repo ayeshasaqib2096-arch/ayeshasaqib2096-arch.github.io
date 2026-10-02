@@ -1,9 +1,320 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-  <title>Ayesha</title>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Free AI">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="theme-color" content="#0b6e7f">
+<title>Free AI</title>
+<style>
+:root{--bg:#eef2f4;--panel:#fff;--ink:#16232b;--mute:#5d6f7a;--line:#d3dce1;--acc:#0b6e7f;--accfg:#fff;--me:#dcecef;--err:#a8322d}
+@media (prefers-color-scheme:dark){:root{--bg:#10181d;--panel:#18232a;--ink:#e6eef2;--mute:#8fa3ae;--line:#2a3a43;--acc:#3fb5c8;--accfg:#08181c;--me:#1f3a42;--err:#ff8a82}}
+*{box-sizing:border-box}html,body{height:100%;margin:0}
+body{background:var(--bg);color:var(--ink);font:16px/1.55 system-ui,-apple-system,"Segoe UI",sans-serif;display:grid;grid-template-columns:250px 1fr;overflow:hidden}
+select,button,textarea,input{font:inherit;color:inherit}
+button{cursor:pointer}
+:focus-visible{outline:2px solid var(--acc);outline-offset:2px}
+.btn{background:var(--bg);border:1px solid var(--line);border-radius:8px;padding:5px 10px}
+.btn.pri{background:var(--acc);color:var(--accfg);border-color:transparent;font-weight:600}
+aside{background:var(--panel);border-right:1px solid var(--line);display:flex;flex-direction:column;min-height:0}
+aside h1{font-size:17px;margin:0;padding:14px}
+#chats{flex:1;overflow-y:auto;padding:0 8px}
+.ci{display:flex;align-items:center;gap:4px;border-radius:8px;padding:6px 8px;cursor:pointer}
+.ci.on{background:var(--me)}.ci span{flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:14px}
+.ci button{border:0;background:none;color:var(--mute);padding:0 4px}
+.side-foot{padding:10px;border-top:1px solid var(--line);display:grid;gap:6px}
+section{display:flex;flex-direction:column;min-width:0;min-height:0}
+.bar{display:flex;gap:8px;align-items:center;padding:8px 12px;background:var(--panel);border-bottom:1px solid var(--line);flex-wrap:wrap}
+.bar select{background:var(--bg);border:1px solid var(--line);border-radius:8px;padding:5px 8px;max-width:46vw}
+.bar label{font-size:13px;color:var(--mute);display:flex;align-items:center;gap:5px}
+#menu{display:none}
+#log{flex:1;overflow-y:auto;padding:16px 14px;display:flex;flex-direction:column;gap:12px}
+.msg{max-width:min(780px,94%);padding:10px 14px;border-radius:12px;word-wrap:break-word;background:var(--panel);border:1px solid var(--line);white-space:pre-wrap}
+.msg.user{align-self:flex-end;background:var(--me);border-color:transparent}
+.msg.err{color:var(--err)}
+.msg img{max-width:220px;border-radius:8px;display:block;margin-top:6px}
+.acts{display:flex;gap:6px;margin-top:6px;white-space:normal}
+.acts button{border:0;background:none;color:var(--mute);font-size:13px;padding:0}
+.acts button:hover{color:var(--acc)}
+.cb{background:var(--bg);border:1px solid var(--line);border-radius:8px;margin:8px 0;white-space:normal}
+.cb .h{display:flex;gap:10px;padding:4px 10px;border-bottom:1px solid var(--line);font-size:12px;color:var(--mute)}
+.cb .h b{flex:1;font-weight:500}.cb .h button{border:0;background:none;color:var(--acc);padding:0;font-size:12px}
+.cb pre{margin:0;padding:10px;overflow-x:auto;font:13.5px/1.5 ui-monospace,Menlo,Consolas,monospace;white-space:pre}
+.cb iframe{width:100%;height:120px;border:0;border-top:1px solid var(--line);background:#fff}
+code.i{background:var(--bg);padding:1px 5px;border-radius:4px;font:14px ui-monospace,Menlo,Consolas,monospace}
+.msg h3{font-size:16px;margin:8px 0 2px}
+#help{margin:auto;max-width:600px;background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:18px 22px;white-space:normal}
+#help h2{margin-top:0;font-size:18px}#help code{background:var(--bg);padding:1px 6px;border-radius:5px}
+.dock{background:var(--panel);border-top:1px solid var(--line);padding:8px 12px calc(8px + env(safe-area-inset-bottom,0px))}
+#chips{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:6px}
+.chip{background:var(--me);border-radius:999px;padding:2px 10px;font-size:13px}
+.chip button{border:0;background:none;padding:0 0 0 6px;color:var(--mute)}
+form{display:flex;gap:6px;align-items:flex-end}
+#input{flex:1;resize:none;max-height:170px;background:var(--bg);border:1px solid var(--line);border-radius:10px;padding:9px 12px}
+.ico{background:var(--bg);border:1px solid var(--line);border-radius:10px;width:40px;height:40px;padding:0}
+.ico.live{background:var(--err);color:#fff}
+#send{height:40px;padding:0 16px}
+#pull{display:flex;gap:6px}#pull input{flex:1;min-width:0;background:var(--bg);border:1px solid var(--line);border-radius:8px;padding:5px 8px}
+#pst{font-size:12px;color:var(--mute);min-height:16px}
+@media(max-width:760px){body{grid-template-columns:1fr}aside{position:fixed;inset:0 25% 0 0;z-index:5;transform:translateX(-101%);transition:transform .2s}aside.open{transform:none;box-shadow:0 0 40px #0006}#menu{display:inline-block}}
+.more{display:contents}#setb{display:none}
+@supports(height:100dvh){html,body{height:100dvh}}
+.bar{padding-top:calc(8px + env(safe-area-inset-top,0px))}
+@media(max-width:760px){
+ select,textarea,input{font-size:16px}
+ .btn,.bar select{min-height:40px}
+ .bar{gap:6px}.bar select{max-width:100%;flex:1 1 40%}
+ #setb{display:inline-block}
+ .more{display:none;width:100%;flex-wrap:wrap;gap:10px 14px;padding:6px 0}
+ .bar.open .more{display:flex}
+ .more label{font-size:15px}
+ .more input[type=checkbox]{width:20px;height:20px}
+ .more input[type=range]{width:120px}
+ aside{padding-top:env(safe-area-inset-top,0px)}
+ .msg{font-size:16px;max-width:96%}
+ .ico{width:44px;height:44px}#send{height:44px}
+ #log{padding:12px 10px}
+ .acts button{font-size:14px;padding:4px 6px}
+}
+@media(prefers-reduced-motion:reduce){aside{transition:none}}
+</style>
 </head>
 <body>
-  <h1>Hello! My website is live.</h1>
+<aside id="side">
+  <h1>Free AI</h1>
+  <div style="padding:0 10px 10px"><button class="btn pri" id="new" style="width:100%">New chat</button></div>
+  <div id="chats"></div>
+  <div class="side-foot">
+    <div id="pull"><input id="pname" placeholder="Download a model, e.g. qwen2.5:7b" aria-label="Model name"><button class="btn" id="pgo">Get</button></div>
+    <div id="pst"></div>
+    <button class="btn" id="libadd">Add files to library</button><input type="file" id="libfile" hidden multiple accept=".txt,.md,.csv,.json,.js,.py,.html,.css,.sql,.log,.xml,.yaml,.yml">
+    <button class="btn" id="libclr">Clear library</button>
+    <button class="btn" id="exp">Export chat (.md)</button>
+  </div>
+</aside>
+<section>
+  <div class="bar">
+    <button class="btn" id="menu" aria-label="Chats">Chats</button>
+    <select id="prov" aria-label="Where the AI runs"><option value="ollama">On my computer (Ollama)</option><option value="groq">Groq (free cloud)</option><option value="gemini">Gemini (free cloud)</option><option value="openrouter">OpenRouter (free cloud)</option></select><button class="btn" id="keyb">Key</button>
+    <select id="model" aria-label="Model"></select>
+    <select id="mode" aria-label="Mode"></select>
+    <button class="btn" id="setb">Settings</button><div class="more" id="more"><label>Creativity <input type="range" id="temp" min="0" max="1.5" step="0.1" value="0.7"></label>
+    <label><input type="checkbox" id="speak"> Read aloud</label>
+    <label><input type="checkbox" id="web"> Web search</label><label><input type="checkbox" id="lib"> My library</label><button class="btn" id="memb">Memory</button><button class="btn" id="re">Reconnect</button></div>
+  </div>
+  <details id="cust" style="display:none;background:var(--panel);border-bottom:1px solid var(--line);padding:6px 12px"><summary>Your instructions</summary>
+    <textarea id="sys" rows="3" style="width:100%;margin-top:6px" placeholder="Tell the AI who it is and how to answer."></textarea></details>
+  <details id="memd" style="background:var(--panel);border-bottom:1px solid var(--line);padding:6px 12px"><summary>Memory: things the AI should always know about you</summary><textarea id="mem" rows="3" style="width:100%;margin-top:6px" placeholder="e.g. I'm a student in Karachi. I prefer short answers. I code in Python."></textarea></details>
+  <main id="log" aria-live="polite"></main>
+  <div class="dock">
+    <div id="chips"></div>
+    <form id="form">
+      <input type="file" id="file" hidden multiple accept="image/*,.txt,.md,.csv,.json,.js,.ts,.py,.html,.css,.java,.c,.cpp,.go,.rs,.sql,.log,.xml,.yaml,.yml">
+      <button type="button" class="ico" id="att" title="Attach files or images" aria-label="Attach">+</button>
+      <button type="button" class="ico" id="mic" title="Dictate" aria-label="Dictate">Mic</button>
+      <textarea id="input" rows="1" placeholder="Message. Enter sends, Shift+Enter adds a line." aria-label="Message"></textarea>
+      <button id="send" class="btn pri" type="submit">Send</button>
+    </form>
+  </div>
+</section>
+<script>
+const $=id=>document.getElementById(id), BASE="http://localhost:11434";
+const MODES={
+chat:["Chat",""],
+tutor:["Tutor","You are a patient tutor. Explain step by step with simple examples, then ask one short question to check understanding."],
+coder:["Coder","You are an expert software engineer. Give correct, runnable code in fenced blocks with the language named, then a brief explanation. Point out edge cases."],
+writer:["Writer","You are a skilled editor and writer. Write clearly and concisely. When given text, improve it and briefly say what you changed."],
+summary:["Summarizer","Summarize the provided material: a one-sentence gist, then key points as short bullets, then any action items or open questions."],
+translate:["Translator","You are a translator. Translate the user's text into the language they ask for; if none is given, translate to English. Output only the translation unless asked."],
+plan:["Planner","You are a practical planner. Break goals into concrete steps with rough time estimates and the first action to take today."],
+research:["Researcher","You are a careful analyst. Compare options, list pros and cons, say what you are unsure about, and never invent facts or sources."],
+custom:["Custom...",""]};
+let chats=[],cur=null,busy=false,ctrl=null,attach=[],codes=[];
+const log=$("log"),input=$("input"),sel=$("model"),send=$("send");
+function save(){try{localStorage.setItem("fas",JSON.stringify({chats,cur,m:sel.value,t:$("temp").value}))}catch(e){}}
+function load(){try{const s=JSON.parse(localStorage.getItem("fas"));if(s){chats=s.chats||[];cur=s.cur;$("temp").value=s.t||.7;return s.m}}catch(e){}}
+const C=()=>chats.find(c=>c.id===cur);
+function newChat(){const c={id:Date.now()+"",title:"New chat",mode:"chat",sys:"",msgs:[]};chats.unshift(c);cur=c.id;draw();save()}
+Object.entries(MODES).forEach(([k,v])=>{const o=document.createElement("option");o.value=k;o.textContent=v[0];$("mode").appendChild(o)});
+function esc(s){return s.replace(/[&<>]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;"}[c]))}
+function fmt(t){
+  let h=esc(t).replace(/```(\w*)\n?([\s\S]*?)(```|$)/g,(m,l,code)=>{codes.push(code.replace(/&lt;/g,"<").replace(/&gt;/g,">").replace(/&amp;/g,"&"));const i=codes.length-1;
+    const run=/^(js|javascript)$/i.test(l)?`<button data-run="${i}">Run</button>`:"";
+    return `<div class="cb"><div class="h"><b>${l||"code"}</b>${run}<button data-copy="${i}">Copy</button><button data-save="${i}" data-l="${l}">Save</button></div><pre>${code}</pre></div>`});
+  return h.replace(/`([^`\n]+)`/g,'<code class="i">$1</code>').replace(/\*\*([^*\n]+)\*\*/g,"<b>$1</b>").replace(/^#{1,3} (.+)$/gm,"<h3>$1</h3>");
+}
+function bubble(m,i){
+  const d=document.createElement("div");d.className="msg "+(m.role==="user"?"user":"bot");
+  d.innerHTML=(m.role==="user"?esc(m.content):fmt(m.content))+(m.images||[]).map(b=>`<img alt="attached" src="data:image/*;base64,${b}">`).join("");
+  if(m.role!=="user"){const a=document.createElement("div");a.className="acts";a.innerHTML=`<button data-cp="${i}">Copy</button><button data-say="${i}">Listen</button>`+(i===C().msgs.length-1?`<button data-redo="1">Regenerate</button>`:"");d.appendChild(a)}
+  log.appendChild(d);return d;
+}
+function draw(){
+  const c=C();codes=[];
+  $("chats").innerHTML="";chats.forEach(x=>{const e=document.createElement("div");e.className="ci"+(x.id===cur?" on":"");e.innerHTML=`<span>${esc(x.title)}</span><button aria-label="Delete chat" data-del="${x.id}">x</button>`;e.dataset.id=x.id;$("chats").appendChild(e)});
+  $("mode").value=c.mode;$("cust").style.display=c.mode==="custom"?"block":"none";$("sys").value=c.sys||"";
+  log.innerHTML="";
+  if(!c.msgs.length)log.innerHTML=`<div id="help"><h2>What would you like to do?</h2>Pick a mode above, then ask. Use <b>+</b> to add a document, code file or image (images need a vision model such as <code>llava</code> or <code>qwen2.5vl</code>). Press <b>Mic</b> to dictate. JavaScript code blocks have a <b>Run</b> button. Everything runs on your computer, free.</div>`;
+  c.msgs.forEach((m,i)=>bubble(m,i));log.scrollTop=log.scrollHeight;
+}
+function helpBox(reason){log.innerHTML=`<div id="help"><h2>Let's get your free AI running</h2><p>${reason}</p><ol>
+<li>Install <b>Ollama</b> (free) from <code>ollama.com</code>.</li>
+<li>Allow this page to connect, then restart Ollama.<br>Mac/Linux: <code>OLLAMA_ORIGINS="*" ollama serve</code><br>Windows: set environment variable <code>OLLAMA_ORIGINS</code> to <code>*</code>.</li>
+<li>Click <b>Reconnect</b>, then type a model name in the sidebar and press <b>Get</b>. Try <code>llama3.2:3b</code> (any laptop), <code>qwen2.5:7b</code> (8 GB+ RAM) or <code>qwen2.5:14b</code> (16 GB+ RAM).</li></ol></div>`}
+async function connectOllama(keep){
+  const prev=sel.value||keep;sel.innerHTML="";
+  try{
+    const j=await (await fetch(BASE+"/api/tags")).json();
+    (j.models||[]).forEach(m=>{const o=document.createElement("option");o.value=o.textContent=m.name;sel.appendChild(o)});
+    if(prev)sel.value=prev;
+    if(!sel.options.length)return helpBox("Ollama is running, but no model is installed yet. Download one in the sidebar.");
+    draw();
+  }catch(e){helpBox("I can't reach Ollama on this computer.")}
+}
+const PROV={groq:["https://api.groq.com/openai/v1","Groq key from console.groq.com"],gemini:["https://generativelanguage.googleapis.com/v1beta/openai","Gemini key from aistudio.google.com"],openrouter:["https://openrouter.ai/api/v1","OpenRouter key from openrouter.ai"]};
+const key=()=>{try{return localStorage.getItem("fas_key_"+$("prov").value)||""}catch(e){return ""}};
+const toOA=m=>m.images&&m.images.length?{role:m.role,content:[{type:"text",text:m.content||"Describe this image."},...m.images.map(b=>({type:"image_url",image_url:{url:"data:image/jpeg;base64,"+b}}))]}:{role:m.role,content:m.content};
+async function connect(keep){
+  keep=keep||sel.value;const p=$("prov").value;try{localStorage.setItem("fas_prov",p)}catch(e){}
+  if(p==="ollama")return connectOllama(keep);
+  sel.innerHTML="";
+  if(!key()){helpBox("Press <b>Key</b> above and paste a free API key ("+PROV[p][1]+"). Your messages are sent to that provider, so don't use it for private material.");return}
+  try{
+    const r=await fetch(PROV[p][0]+"/models",{headers:{Authorization:"Bearer "+key()}});
+    if(!r.ok)throw new Error("status "+r.status+". Check the key.");
+    let ids=((await r.json()).data||[]).map(m=>m.id.replace(/^models\//,""));
+    if(p==="openrouter")ids=ids.filter(i=>i.endsWith(":free"));
+    if(p==="gemini")ids=ids.filter(i=>/gemini|gemma/.test(i));
+    ids.sort().forEach(i=>{const o=document.createElement("option");o.value=o.textContent=i;sel.appendChild(o)});
+    if(keep&&ids.includes(keep))sel.value=keep;
+    if(!ids.length)throw new Error("no chat models found");
+    draw();
+  }catch(e){helpBox("Couldn't load models from "+p+": "+e.message)}
+}
+$("prov").onchange=()=>{sel.innerHTML="";connect()};
+$("keyb").onclick=()=>{const p=$("prov").value;if(p==="ollama"){alert("Running on your computer needs no key.");return}
+  const k=prompt("Paste your free "+PROV[p][1]+". It is stored only in this browser.",key());
+  if(k!==null){try{localStorage.setItem("fas_key_"+p,k.trim())}catch(e){}connect()}};
+async function ask(text,regen){
+  const c=C();
+  if(!regen){
+    let body=text;const imgs=[];
+    for(const f of attach){if(f.img)imgs.push(f.data);else body+=`\n\n[File: ${f.name}]\n\`\`\`\n${f.data.slice(0,24000)}\n\`\`\``}
+    c.msgs.push({role:"user",content:body,images:imgs.length?imgs:undefined});
+    if(c.title==="New chat")c.title=text.slice(0,40)||"Chat";
+    attach=[];chips();
+  }
+  draw();busy=true;send.textContent="Stop";
+  const out=document.createElement("div");out.className="msg bot";out.textContent="...";log.appendChild(out);log.scrollTop=log.scrollHeight;
+  const q=[...c.msgs].reverse().find(m=>m.role==="user").content;let extra="";
+  try{if($("lib").checked)extra+=await libCtx(q);if($("web").checked)extra+=await webCtx(q)}catch(e){extra+="\n(Note: a lookup failed: "+e.message+")"}
+  const sys=[c.mode==="custom"?c.sys:MODES[c.mode][1],$("mem").value.trim()?"Facts about the user: "+$("mem").value.trim():"",extra].filter(Boolean).join("\n\n");
+  const msgs=(sys?[{role:"system",content:sys}]:[]).concat(c.msgs.map(m=>({role:m.role,content:m.content,images:m.images})));
+  let acc="";ctrl=new AbortController();
+  try{
+    const cloud=$("prov").value!=="ollama";
+    const r=cloud?await fetch(PROV[$("prov").value][0]+"/chat/completions",{method:"POST",signal:ctrl.signal,headers:{"Content-Type":"application/json",Authorization:"Bearer "+key()},body:JSON.stringify({model:sel.value,stream:true,temperature:+$("temp").value,messages:msgs.map(toOA)})}):await fetch(BASE+"/api/chat",{method:"POST",signal:ctrl.signal,body:JSON.stringify({model:sel.value,messages:msgs,stream:true,options:{temperature:+$("temp").value}})});
+    if(!r.ok)throw new Error((cloud?"The provider":"Ollama")+" returned "+r.status+". "+(cloud?(await r.text()).slice(0,200):"If you attached an image, this model may not support images."));
+    const rd=r.body.getReader(),dec=new TextDecoder();let buf="";
+    for(;;){const {done,value}=await rd.read();if(done)break;buf+=dec.decode(value,{stream:true});const ls=buf.split("\n");buf=ls.pop();
+      for(const l of ls){if(!l.trim())continue;try{let j,d;if(cloud){if(!l.startsWith("data:")||l.includes("[DONE]"))continue;j=JSON.parse(l.slice(5));d=j.choices?.[0]?.delta?.content}else{j=JSON.parse(l);d=j.message?.content}if(d){acc+=d;codes.length=0;out.innerHTML=fmt(acc);log.scrollTop=log.scrollHeight}}catch(e){}}}
+    c.msgs.push({role:"assistant",content:acc});
+    if($("speak").checked)say(acc);
+  }catch(e){
+    if(e.name==="AbortError"){if(acc)c.msgs.push({role:"assistant",content:acc})}
+    else{c.msgs.push({role:"assistant",content:(acc?acc+"\n\n":"")+"Couldn't finish: "+e.message})}
+  }
+  busy=false;ctrl=null;send.textContent="Send";save();draw();
+}
+function say(t){if(!window.speechSynthesis)return;speechSynthesis.cancel();speechSynthesis.speak(new SpeechSynthesisUtterance(t.replace(/```[\s\S]*?```/g," code block ").replace(/[*#`]/g,"")))}
+function chips(){$("chips").innerHTML="";attach.forEach((f,i)=>{const s=document.createElement("span");s.className="chip";s.innerHTML=`${esc(f.name)}<button aria-label="Remove" data-rm="${i}">x</button>`;$("chips").appendChild(s)})}
+$("att").onclick=()=>$("file").click();
+$("file").onchange=async e=>{
+  for(const f of e.target.files){
+    if(f.type.startsWith("image/")){const d=await new Promise(r=>{const x=new FileReader();x.onload=()=>r(x.result.split(",")[1]);x.readAsDataURL(f)});attach.push({name:f.name,img:1,data:d})}
+    else attach.push({name:f.name,data:await f.text()});
+  }
+  e.target.value="";chips();
+};
+document.addEventListener("click",e=>{
+  const t=e.target,g=k=>t.dataset[k];
+  if(g("rm")!==undefined){attach.splice(+g("rm"),1);chips()}
+  else if(g("copy")!==undefined){navigator.clipboard.writeText(codes[+g("copy")]);t.textContent="Copied"}
+  else if(g("cp")!==undefined){navigator.clipboard.writeText(C().msgs[+g("cp")].content);t.textContent="Copied"}
+  else if(g("say")!==undefined)say(C().msgs[+g("say")].content);
+  else if(g("redo")){const c=C();if(!busy&&c.msgs.at(-1).role==="assistant"){c.msgs.pop();ask("",true)}}
+  else if(g("run")!==undefined){
+    const cb=t.closest(".cb");cb.querySelector("iframe")?.remove();
+    const f=document.createElement("iframe");f.setAttribute("sandbox","allow-scripts");
+    f.srcdoc=`<body style="font:13px monospace;margin:8px;white-space:pre-wrap"><script>const o=document.body;const w=(...a)=>{o.append(a.map(x=>typeof x==="object"?JSON.stringify(x):String(x)).join(" ")+"\\n")};console.log=w;console.error=w;try{${codes[+g("run")].replace(/<\/script>/g,"<\\/script>")}}catch(e){w("Error: "+e.message)}<\/script>`;
+    cb.appendChild(f);
+  }
+  else if(g("save")!==undefined){const x={javascript:"js",js:"js",python:"py",py:"py",html:"html",css:"css",json:"json",java:"java",c:"c",cpp:"cpp",sql:"sql",bash:"sh",sh:"sh",ts:"ts",typescript:"ts",md:"md"}[(g("l")||"").toLowerCase()]||"txt";const a=document.createElement("a");a.href=URL.createObjectURL(new Blob([codes[+g("save")]]));a.download="code."+x;a.click()}
+  else if(g("del")){chats=chats.filter(c=>c.id!==g("del"));if(!chats.length)newChat();else if(cur===g("del"))cur=chats[0].id;draw();save();e.stopPropagation()}
+  else if(t.closest(".ci")){cur=t.closest(".ci").dataset.id;draw();save();$("side").classList.remove("open")}
+});
+$("new").onclick=()=>{newChat();$("side").classList.remove("open")};
+$("menu").onclick=()=>$("side").classList.toggle("open");
+$("mode").onchange=()=>{C().mode=$("mode").value;$("cust").style.display=$("mode").value==="custom"?"block":"none";save()};
+$("sys").oninput=()=>{C().sys=$("sys").value;save()};
+$("temp").onchange=save;sel.onchange=save;$("re").onclick=()=>connect();
+$("exp").onclick=()=>{const c=C(),md=c.msgs.map(m=>`**${m.role==="user"?"You":"AI"}:**\n\n${m.content}`).join("\n\n---\n\n");const a=document.createElement("a");a.href=URL.createObjectURL(new Blob([md],{type:"text/markdown"}));a.download=(c.title||"chat").replace(/[^\w-]+/g,"_")+".md";a.click()};
+$("pgo").onclick=async()=>{
+  const n=$("pname").value.trim();if(!n)return;$("pst").textContent="Starting...";
+  try{const r=await fetch(BASE+"/api/pull",{method:"POST",body:JSON.stringify({name:n,stream:true})});
+    const rd=r.body.getReader(),dec=new TextDecoder();let b="";
+    for(;;){const {done,value}=await rd.read();if(done)break;b+=dec.decode(value,{stream:true});const ls=b.split("\n");b=ls.pop();
+      for(const l of ls){try{const j=JSON.parse(l);if(j.error){$("pst").textContent=j.error;return}$("pst").textContent=j.status+(j.total?` ${Math.round(100*j.completed/j.total)}%`:"")}catch(e){}}}
+    $("pst").textContent="Done: "+n;connect(n);
+  }catch(e){$("pst").textContent="Can't reach Ollama. See setup steps."}
+};
+async function webCtx(q){
+  const j=await (await fetch("https://en.wikipedia.org/w/api.php?action=query&generator=search&gsrsearch="+encodeURIComponent(q.slice(0,200))+"&gsrlimit=3&prop=extracts&exintro=1&explaintext=1&format=json&origin=*")).json();
+  const p=Object.values(j.query?.pages||{});
+  return p.length?"Web results from Wikipedia. Use them if relevant and name the source:\n"+p.map(x=>"## "+x.title+"\n"+(x.extract||"").slice(0,1500)).join("\n\n"):"";
+}
+let lib=[];try{lib=JSON.parse(localStorage.getItem("fas_lib")||"[]")}catch(e){}
+async function emb(a){const r=await fetch(BASE+"/api/embed",{method:"POST",body:JSON.stringify({model:"nomic-embed-text",input:a})});if(!r.ok)throw new Error("Library needs an embedding model. Download nomic-embed-text in the sidebar.");return (await r.json()).embeddings}
+const libStat=()=>{$("pst").textContent="Library: "+new Set(lib.map(x=>x.n)).size+" files, "+lib.length+" passages"};
+$("libadd").onclick=()=>$("libfile").click();
+$("libfile").onchange=async e=>{
+  for(const f of e.target.files){
+    const t=await f.text(),ch=[];for(let i=0;i<t.length;i+=900)ch.push(t.slice(i,i+1000));
+    try{$("pst").textContent="Indexing "+f.name+"...";for(let i=0;i<ch.length;i+=16){const part=ch.slice(i,i+16),v=await emb(part);part.forEach((x,k)=>lib.push({n:f.name,t:x,v:v[k].map(y=>+y.toFixed(3))}))}}
+    catch(err){$("pst").textContent=err.message;break}
+  }
+  try{localStorage.setItem("fas_lib",JSON.stringify(lib))}catch(err){lib=[];$("pst").textContent="Library too big for browser storage. Try fewer or smaller files.";return}
+  e.target.value="";libStat();
+};
+$("libclr").onclick=()=>{lib=[];try{localStorage.removeItem("fas_lib")}catch(e){}libStat()};
+async function libCtx(q){
+  if(!lib.length)return "";
+  const [qv]=await emb([q]);
+  const top=lib.map(x=>({x,s:x.v.reduce((a,b,i)=>a+b*qv[i],0)})).sort((a,b)=>b.s-a.s).slice(0,4);
+  return "Excerpts from the user's own library. Answer from them when relevant and name the file:\n"+top.map(o=>"["+o.x.n+"] "+o.x.t).join("\n---\n");
+}
+try{$("mem").value=localStorage.getItem("fas_mem")||""}catch(e){}
+$("mem").oninput=()=>{try{localStorage.setItem("fas_mem",$("mem").value)}catch(e){}};
+$("memb").onclick=()=>{const d=$("memd");d.open=!d.open};
+$("setb").onclick=()=>document.querySelector(".bar").classList.toggle("open");
+(function(){const c=document.createElement("canvas");c.width=c.height=180;const x=c.getContext("2d");x.fillStyle="#0b6e7f";x.fillRect(0,0,180,180);x.fillStyle="#fff";x.font="bold 84px system-ui,sans-serif";x.textAlign="center";x.textBaseline="middle";x.fillText("AI",90,96);const u=c.toDataURL("image/png");["apple-touch-icon","icon"].forEach(r=>{const l=document.createElement("link");l.rel=r;l.href=u;document.head.appendChild(l)})})();
+const SR=window.SpeechRecognition||window.webkitSpeechRecognition;let rec=null;
+$("mic").onclick=()=>{
+  if(!SR){alert("Dictation isn't supported in this browser. Try Chrome or Edge.");return}
+  if(rec){rec.stop();return}
+  rec=new SR();rec.interimResults=false;rec.continuous=true;$("mic").classList.add("live");
+  rec.onresult=e=>{input.value+=(input.value?" ":"")+e.results[e.results.length-1][0].transcript};
+  rec.onend=()=>{rec=null;$("mic").classList.remove("live")};rec.start();
+};
+$("form").onsubmit=e=>{e.preventDefault();if(busy){ctrl&&ctrl.abort();return}
+  const t=input.value.trim();if(!t&&!attach.length)return;if(!sel.value)return;input.value="";input.style.height="auto";ask(t)};
+input.onkeydown=e=>{if(e.key==="Enter"&&!e.shiftKey){e.preventDefault();$("form").requestSubmit()}};
+input.oninput=()=>{input.style.height="auto";input.style.height=Math.min(input.scrollHeight,170)+"px"};
+try{$("prov").value=localStorage.getItem("fas_prov")||"ollama"}catch(e){}
+const m0=load();if(!chats.length||!C())newChat();draw();connect(m0);
+</script>
 </body>
 </html>
